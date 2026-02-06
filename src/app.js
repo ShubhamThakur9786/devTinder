@@ -17,9 +17,23 @@ app.post("/signup", async (req, res) => {
   }
 });
 
-app.get("/user", (req, res) => {
-  console.log(req.query);
-  res.send("User Data Fetched");
+app.get("/user", async (req, res) => {
+  try {
+    const userEmail = req.body.email;
+    const user = await User.find({ email: userEmail });
+    res.send(user);
+  } catch (error) {
+    res.status(400).send("Something Went Wrong: " + error.message);
+  }
+});
+
+app.get("/feed", async (req, res) => {
+  try {
+    const user = await User.find({});
+    res.send(user);
+  } catch (error) {
+    res.status(400).send("Something Went Wrong: " + error.message);
+  }
 });
 
 connectDB()
