@@ -1,24 +1,25 @@
 const express = require("express");
 const connectDB = require("./config/database");
 const User = require("./models/user");
+const { Query } = require("mongoose");
 const app = express();
+
+app.use(express.json());
 
 app.post("/signup", async (req, res) => {
   try {
-    const userObj = {
-      firstName: "Shubham",
-      lastName: "Thakur",
-      email: "shubham@thakur.com",
-      password: "shubham123",
-    };
-
-    const user = new User();
+    const user = new User(req.body);
 
     await user.save();
     res.send("user Added Successfully");
   } catch (error) {
     res.status(401).send("Error saving the user: ", error.message);
   }
+});
+
+app.get("/user", (req, res) => {
+  console.log(req.query);
+  res.send("User Data Fetched");
 });
 
 connectDB()
