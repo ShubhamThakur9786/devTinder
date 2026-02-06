@@ -13,7 +13,7 @@ app.post("/signup", async (req, res) => {
     await user.save();
     res.send("user Added Successfully");
   } catch (error) {
-    res.status(401).send("Error saving the user: ", error.message);
+    res.status(401).send("Error saving the user: " + error.message);
   }
 });
 
@@ -46,17 +46,36 @@ app.delete("/user", async (req, res) => {
   }
 });
 
-app.patch("/edit", async (req, res) => {
+app.patch("/edit/:userId", async (req, res) => {
   try {
-    const userId = req.body.userId;
+    const userId = req.params?.userId;
+    // console.log(userId);
     const data = req.body;
+    const allowed_updates = [
+      "about",
+      "firstName",
+      "lastName",
+      "photoUrl",
+      "skills",
+      "gender",
+    ];
+    if (data.skills.length > 10) {
+      throw new Error("Skills cann't be more than 10");
+    }
+    const isAllowed = Object.keys(data).every((k) =>
+      allowed_updates.includes(k)
+    );
+    if (!isAllowed) {
+      throw new Error("Update are not allowed");
+    }
     const user = await User.findByIdAndUpdate(userId, data, {
       returnDocument: "before",
+      runValidators: true,
     });
     console.log(user);
     res.send("User Updated Successfully");
   } catch (error) {
-    res.status(400).send("Something went wrong: ", error.message);
+    res.status(400).send("Something went wrong: " + error.message);
   }
 });
 
